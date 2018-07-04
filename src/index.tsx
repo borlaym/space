@@ -6,18 +6,22 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-const geometry = new THREE.CubeGeometry(1, 1, 1);
-const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+const texture = new THREE.TextureLoader().load("textures/1.jpg");
+texture.wrapS = THREE.RepeatWrapping;
+texture.wrapT = THREE.RepeatWrapping;
+texture.repeat.set(4, 4);
+
+const geometry = new THREE.CubeGeometry(4, 4, 4);
+const material = new THREE.MeshBasicMaterial({ color: 0xaaaaaa, map: texture, side: THREE.DoubleSide });
 const cube = new THREE.Mesh(geometry, material);
 
 scene.add(cube);
-
+cube.position.setZ(4)
+cube.rotateX(30)
 camera.position.z = 5;
 
 function animate() {
 	requestAnimationFrame(animate);
-	cube.rotation.x += 0.01;
-	cube.rotation.y += 0.01;
 	renderer.render(scene, camera);
 }
 animate();

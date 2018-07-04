@@ -12,8 +12,12 @@ texture.wrapT = THREE.RepeatWrapping;
 texture.repeat.set(4, 4);
 
 const geometry = new THREE.CubeGeometry(4, 4, 4);
-const material = new THREE.MeshBasicMaterial({ color: 0xaaaaaa, map: texture, side: THREE.DoubleSide });
+const material = new THREE.MeshLambertMaterial({ color: 0xaaaaaa, map: texture, side: THREE.DoubleSide });
 const cube = new THREE.Mesh(geometry, material);
+
+const light = new THREE.PointLight(0xffffff, 2, 100, 1);
+light.position.set(0, 0, 3);
+scene.add(light);
 
 scene.add(cube);
 cube.position.setZ(4)

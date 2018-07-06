@@ -16,17 +16,24 @@ texture.wrapS = THREE.RepeatWrapping;
 texture.wrapT = THREE.RepeatWrapping;
 texture.repeat.set(4, 4);
 
-const geometry = new THREE.CubeGeometry(4, 4, 6, 50, 50, 50);
+const geometry = new THREE.CubeGeometry(4, 4, 10, 50, 50, 50);
 const material = new THREE.MeshLambertMaterial({ color: 0xaaaaaa, map: texture, side: THREE.DoubleSide });
 const cube = new THREE.Mesh(geometry, material);
 
-const light = new THREE.PointLight(0xffffff, 13, 4, 2);
-light.position.set(0, 0, 4);
+const light = new THREE.PointLight(0xffffff, 13, 5, 2);
+light.position.set(0, 1.5, 2.5);
 scene.add(light);
 
+const light2 = new THREE.PointLight(0xffffff, 13, 5, 2);
+light2.position.set(0, 1.5, 0);
+scene.add(light2);
+
+const light3= new THREE.PointLight(0xffffff, 13, 5, 2);
+light3.position.set(0, 1.5, -2.5);
+scene.add(light3);
+
 scene.add(cube);
-cube.position.setZ(4)
-camera.position.z = 5;
+camera.position.z = 4;
 
 const SPEED = 0.1;
 const TURN_SPEED = 4;

@@ -80,6 +80,7 @@ function animate() {
 		camera.rotation.x -= dy / window.innerHeight * TURN_SPEED;
 		camera.rotation.x = Math.min(camera.rotation.x, 0.75);
 		camera.rotation.x = Math.max(camera.rotation.x, -0.75);
+		camera.rotation.order = 'YXZ'
 	}
 	const motion = new THREE.Vector3(0, 0, 0);
 	if (state.keysDown.indexOf('w') > -1) {

@@ -31,6 +31,8 @@ camera.position.z = 5;
 const SPEED = 0.1;
 const TURN_SPEED = 4;
 
+const colliders: THREE.Object3D[] = [cube];
+
 interface InterfaceState {
 	keysDown: string[],
 	mouseMovement: {
@@ -95,7 +97,14 @@ function animate() {
 	if (state.keysDown.indexOf('d') > -1) {
 		motion.x += SPEED;
 	}
-	camera.position.add(motion.applyEuler(new THREE.Euler(0, camera.rotation.y, 0)));
+	motion.applyEuler(new THREE.Euler(0, camera.rotation.y, 0));
+
+	const raycaster = new THREE.Raycaster(camera.position, motion.clone().normalize());
+	const results = raycaster.intersectObjects(colliders);
+	const collisions = results.filter(result => result.distance < 1);
+	if (!collisions.length) {
+		camera.position.add(motion);
+	}
 
 	// light.position.set(camera.position.x, camera.position.y, camera.position.z);
 	state.mouseMovement.x = 0;

@@ -53,7 +53,7 @@ document.addEventListener('keyup', (event) => {
 });
 
 const onMouseMove = (event: MouseEvent) => {
-	global.console.com(event);
+	global.console.log(event);
 	state.mouseMovement.x = event.movementX;
 	state.mouseMovement.y = event.movementY;
 };
@@ -73,20 +73,19 @@ function animate() {
 		const dx = state.mouseMovement.x || 0;
 		camera.rotation.y -= dx / window.innerWidth * TURN_SPEED;
 	}
-	let moveLength = 0;
+	const motion = new THREE.Vector3(0, 0, 0);
 	if (state.keysDown.indexOf('w') > -1) {
-		moveLength = -SPEED;
+		motion.z -= SPEED;
 	}
 	if (state.keysDown.indexOf('s') > -1) {
-		moveLength = SPEED;
+		motion.z += SPEED;
 	}
-	// if (state.keysDown.indexOf('a') > -1) {
-	// 	camera.position.x -= SPEED;
-	// }
-	// if (state.keysDown.indexOf('d') > -1) {
-	// 	camera.position.x += SPEED;
-	// }
-	const motion = new THREE.Vector3(0, 0, moveLength)
+	if (state.keysDown.indexOf('a') > -1) {
+		motion.x -= SPEED;
+	}
+	if (state.keysDown.indexOf('d') > -1) {
+		motion.x += SPEED;
+	}
 	camera.position.add(motion.applyEuler(camera.rotation));
 
 	// light.position.set(camera.position.x, camera.position.y, camera.position.z);

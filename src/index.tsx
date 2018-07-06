@@ -25,7 +25,7 @@ cube.position.setZ(4)
 camera.position.z = 5;
 
 const SPEED = 0.1;
-const TURN_SPEED = 4;
+const TURN_SPEED = 0.05;
 
 interface InterfaceState {
 	keysDown: string[],
@@ -60,32 +60,38 @@ document.addEventListener('mousemove', (event) => {
 })
 
 function animate() {
-	if (state.keysDown.indexOf('w') > -1) {
-		camera.position.z -= SPEED;
-	}
-	if (state.keysDown.indexOf('s') > -1) {
-		camera.position.z += SPEED;
-	}
-	if (state.keysDown.indexOf('a') > -1) {
-		camera.position.x -= SPEED;
-	}
-	if (state.keysDown.indexOf('d') > -1) {
-		camera.position.x += SPEED;
-	}
-
 	if (state.mousePos.x && state.mousePos.y) {
 		if (!state.lastMousePos.x || !state.lastMousePos.y) {
 			state.lastMousePos.x = state.mousePos.x;
 			state.lastMousePos.y = state.mousePos.y;
 		}
 		const dx = state.mousePos.x - state.lastMousePos.x;
-		camera.rotation.y -= dx / window.innerWidth * TURN_SPEED;
+		if (dx > 0) {
+			camera.rotation.y -= TURN_SPEED;
+		}
+		if (dx < 0) {
+			camera.rotation.y += TURN_SPEED;
+		}
 		state.lastMousePos = {
 			x: state.mousePos.x,
 			y: state.mousePos.y
 		}
 	}
-
+	let moveLength = 0;
+	if (state.keysDown.indexOf('w') > -1) {
+		moveLength = -SPEED;
+	}
+	if (state.keysDown.indexOf('s') > -1) {
+		moveLength = SPEED;
+	}
+	// if (state.keysDown.indexOf('a') > -1) {
+	// 	camera.position.x -= SPEED;
+	// }
+	// if (state.keysDown.indexOf('d') > -1) {
+	// 	camera.position.x += SPEED;
+	// }
+	const iranyVektor = new THREE.Vector3(0, 0, moveLength)
+	camera.position.add(iranyVektor.applyEuler(camera.rotation));
 	requestAnimationFrame(animate);
 	renderer.render(scene, camera);
 }

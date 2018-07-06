@@ -7,6 +7,10 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
+renderer.domElement.onclick = () => {
+	renderer.domElement.requestPointerLock();
+}
+
 const texture = new THREE.TextureLoader().load("textures/1.jpg");
 texture.wrapS = THREE.RepeatWrapping;
 texture.wrapT = THREE.RepeatWrapping;
@@ -25,15 +29,11 @@ cube.position.setZ(4)
 camera.position.z = 5;
 
 const SPEED = 0.1;
-const TURN_SPEED = 0.05;
+const TURN_SPEED = 4;
 
 interface InterfaceState {
 	keysDown: string[],
-	lastMousePos: {
-		x?: number,
-		y?: number
-	}
-	mousePos: {
+	mouseMovement: {
 		x?: number,
 		y?: number
 	}
@@ -41,8 +41,7 @@ interface InterfaceState {
 
 const state: InterfaceState = {
 	keysDown: [],
-	lastMousePos: {},
-	mousePos: {}
+	mouseMovement: {}
 };
 
 document.addEventListener('keydown', (event) => {
@@ -53,29 +52,26 @@ document.addEventListener('keyup', (event) => {
 	state.keysDown = state.keysDown.filter(key => key !== event.key);
 });
 
-document.addEventListener('mousemove', (event) => {
-	state.mousePos.x = event.x;
-	state.mousePos.y = event.y;
+const onMouseMove = (event: MouseEvent) => {
+	global.console.com(event);
+	state.mouseMovement.x = event.movementX;
+	state.mouseMovement.y = event.movementY;
+};
 
-})
+const lockChangeAlert = () => {
+	if (document.pointerLockElement === renderer.domElement) {
+			global.console.log('locked to canvas');
+			document.addEventListener("mousemove", onMouseMove, false);
+		} else {
+			document.removeEventListener("mousemove", onMouseMove, false);
+		}
+	}
+document.addEventListener('pointerlockchange', lockChangeAlert, false);
 
 function animate() {
-	if (state.mousePos.x && state.mousePos.y) {
-		if (!state.lastMousePos.x || !state.lastMousePos.y) {
-			state.lastMousePos.x = state.mousePos.x;
-			state.lastMousePos.y = state.mousePos.y;
-		}
-		const dx = state.mousePos.x - state.lastMousePos.x;
-		if (dx > 0) {
-			camera.rotation.y -= TURN_SPEED;
-		}
-		if (dx < 0) {
-			camera.rotation.y += TURN_SPEED;
-		}
-		state.lastMousePos = {
-			x: state.mousePos.x,
-			y: state.mousePos.y
-		}
+	if (state.mouseMovement.x || state.mouseMovement.y) {
+		const dx = state.mouseMovement.x || 0;
+		camera.rotation.y -= dx / window.innerWidth * TURN_SPEED;
 	}
 	let moveLength = 0;
 	if (state.keysDown.indexOf('w') > -1) {
@@ -90,8 +86,11 @@ function animate() {
 	// if (state.keysDown.indexOf('d') > -1) {
 	// 	camera.position.x += SPEED;
 	// }
-	const iranyVektor = new THREE.Vector3(0, 0, moveLength)
-	camera.position.add(iranyVektor.applyEuler(camera.rotation));
+	const motion = new THREE.Vector3(0, 0, moveLength)
+	camera.position.add(motion.applyEuler(camera.rotation));
+
+	// light.position.set(camera.position.x, camera.position.y, camera.position.z);
+
 	requestAnimationFrame(animate);
 	renderer.render(scene, camera);
 }

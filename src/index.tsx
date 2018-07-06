@@ -34,14 +34,17 @@ const TURN_SPEED = 4;
 interface InterfaceState {
 	keysDown: string[],
 	mouseMovement: {
-		x?: number,
-		y?: number
+		x: number,
+		y: number
 	}
 };
 
 const state: InterfaceState = {
 	keysDown: [],
-	mouseMovement: {}
+	mouseMovement: {
+		x: 0,
+		y: 0
+	}
 };
 
 document.addEventListener('keydown', (event) => {
@@ -54,8 +57,8 @@ document.addEventListener('keyup', (event) => {
 
 const onMouseMove = (event: MouseEvent) => {
 	global.console.log(event);
-	state.mouseMovement.x = event.movementX;
-	state.mouseMovement.y = event.movementY;
+	state.mouseMovement.x += event.movementX;
+	state.mouseMovement.y += event.movementY;
 };
 
 const lockChangeAlert = () => {
@@ -72,6 +75,11 @@ function animate() {
 	if (state.mouseMovement.x || state.mouseMovement.y) {
 		const dx = state.mouseMovement.x || 0;
 		camera.rotation.y -= dx / window.innerWidth * TURN_SPEED;
+
+		const dy = state.mouseMovement.y || 0;
+		camera.rotation.x -= dy / window.innerHeight * TURN_SPEED;
+		camera.rotation.x = Math.min(camera.rotation.x, 0.75);
+		camera.rotation.x = Math.max(camera.rotation.x, -0.75);
 	}
 	const motion = new THREE.Vector3(0, 0, 0);
 	if (state.keysDown.indexOf('w') > -1) {
@@ -86,10 +94,11 @@ function animate() {
 	if (state.keysDown.indexOf('d') > -1) {
 		motion.x += SPEED;
 	}
-	camera.position.add(motion.applyEuler(camera.rotation));
+	camera.position.add(motion.applyEuler(new THREE.Euler(0, camera.rotation.y, 0)));
 
 	// light.position.set(camera.position.x, camera.position.y, camera.position.z);
-
+	state.mouseMovement.x = 0;
+	state.mouseMovement.y = 0;
 	requestAnimationFrame(animate);
 	renderer.render(scene, camera);
 }

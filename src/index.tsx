@@ -1,3 +1,4 @@
+import { uniq } from 'lodash';
 import * as THREE from 'three';
 
 const scene = new THREE.Scene();
@@ -21,10 +22,42 @@ scene.add(light);
 
 scene.add(cube);
 cube.position.setZ(4)
-cube.rotateX(30)
 camera.position.z = 5;
 
+const SPEED = 0.1;
+
+interface InterfaceState {
+	keysDown: string[]
+};
+
+const state: InterfaceState = {
+	keysDown: []
+};
+
+document.addEventListener('keydown', (event) => {
+	state.keysDown = uniq(state.keysDown.concat(event.key));
+});
+
+document.addEventListener('keyup', (event) => {
+	state.keysDown = state.keysDown.filter(key => key !== event.key);
+});
+
 function animate() {
+	if (state.keysDown.indexOf('w') > -1) {
+		camera.position.z -= SPEED;
+	}
+	if (state.keysDown.indexOf('s') > -1) {
+		camera.position.z += SPEED;
+	}
+	if (state.keysDown.indexOf('a') > -1) {
+		camera.position.x -= SPEED;
+	}
+	if (state.keysDown.indexOf('d') > -1) {
+		camera.position.x += SPEED;
+	}
+
+
+
 	requestAnimationFrame(animate);
 	renderer.render(scene, camera);
 }

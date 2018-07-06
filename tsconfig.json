@@ -20,7 +20,8 @@
   },
   "exclude": [
     "node_modules",
-    "build",
+	"build",
+	"docs",
     "scripts",
     "acceptance-tests",
     "webpack",

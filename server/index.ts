@@ -8,10 +8,10 @@ const http = new Server(app);
 var io = socketio(http);
 
 io.on('connection', function (socket) {
-	let newPlayer = new Player(socket);
-	global.console.log(`New player ${newPlayer.id} connected`);
+	let player = new Player(socket);
+	global.console.log(`New player ${player.shortId} connected`);
 	socket.on('disconnect', () => {
-		global.console.log(`Player ${newPlayer.id} disconnected`);
+		global.console.log(`Player ${player.shortId} disconnected`);
 	});
 });
 

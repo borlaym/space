@@ -7,4 +7,8 @@ export default class Player {
 		this.socket = socket;
 		this.id = uuid();
 	}
+
+	get shortId() {
+		return this.id.split('-')[0];
+	}
 }

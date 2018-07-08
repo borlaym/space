@@ -63,6 +63,13 @@ connection.on('newPlayer', (data: { player: string}) => {
 	mesh.position.y = -1;
 });
 
+connection.on('state', (data: { player: string, x: number, y: number, z: number }) => {
+	const player = players.find(p => p.player === data.player);
+	if (player) {
+		player.mesh.position.set(data.x, -1, data.z);
+	}
+});
+
 interface InterfaceState {
 	keysDown: string[],
 	mouseMovement: {

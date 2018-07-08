@@ -13,6 +13,15 @@ io.on('connection', function (socket) {
 	socket.on('disconnect', () => {
 		global.console.log(`Player ${player.shortId} disconnected`);
 	});
+	socket.on('state', (state) => {
+		socket.broadcast.emit('state', {
+			player: player.shortId,
+			...state
+		});
+	});
+	socket.broadcast.emit('newPlayer', {
+		player: player.shortId
+	});
 });
 
 http.listen(3001, function () {

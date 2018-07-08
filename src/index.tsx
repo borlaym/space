@@ -2,7 +2,7 @@ import { uniq } from 'lodash';
 import * as socketio from 'socket.io-client';
 import * as THREE from 'three';
 
-socketio('http://localhost:3001');
+const connection = socketio('http://localhost:3001');
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -42,6 +42,26 @@ const SPEED = 0.1;
 const TURN_SPEED = 4;
 
 const colliders: THREE.Object3D[] = [cube];
+
+const playerGeometry = new THREE.CubeGeometry(0.5, 2, 0.5);
+const playerMaterial = new THREE.MeshLambertMaterial({ color: 0xff0000 });
+
+const players: InterfacePlayer[] = [];
+
+interface InterfacePlayer {
+	player: string,
+	mesh: THREE.Mesh
+}
+
+connection.on('newPlayer', (data: { player: string}) => {
+	const mesh = new THREE.Mesh(playerGeometry, playerMaterial);
+	players.push({
+		mesh,
+		player: data.player
+	});
+	scene.add(mesh);
+	mesh.position.y = -1;
+});
 
 interface InterfaceState {
 	keysDown: string[],
@@ -116,9 +136,15 @@ function animate() {
 		camera.position.add(motion);
 	}
 
-	// light.position.set(camera.position.x, camera.position.y, camera.position.z);
 	state.mouseMovement.x = 0;
 	state.mouseMovement.y = 0;
+
+	connection.emit('state', {
+		x: camera.position.x,
+		y: camera.position.y,
+		z: camera.position.z,
+	});
+
 	requestAnimationFrame(animate);
 	renderer.render(scene, camera);
 }

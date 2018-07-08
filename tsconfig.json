@@ -19,6 +19,7 @@
     "noUnusedLocals": true
   },
   "exclude": [
+    "server",
     "node_modules",
 	"build",
 	"docs",

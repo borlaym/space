@@ -1,28 +1,31 @@
 {
-  "name": "space",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "lodash": "^4.17.10",
-    "react": "^16.4.1",
-    "react-dom": "^16.4.1",
-    "react-scripts-ts": "2.16.0",
-    "three": "^0.94.0"
-  },
-  "homepage": "https://borlaym.github.io/space/",
-  "scripts": {
-    "start": "react-scripts-ts start",
-    "build": "react-scripts-ts build && mv build docs",
-    "test": "react-scripts-ts test --env=jsdom",
-    "eject": "react-scripts-ts eject"
-  },
-  "devDependencies": {
-    "@types/jest": "^23.1.4",
-    "@types/lodash": "^4.14.110",
-    "@types/node": "^10.5.1",
-    "@types/react": "^16.4.6",
-    "@types/react-dom": "^16.0.6",
-    "@types/three": "^0.92.11",
-    "typescript": "^2.9.2"
-  }
+	"name": "space",
+	"version": "0.1.0",
+	"private": true,
+	"dependencies": {
+		"@types/express": "^4.16.0",
+		"express": "^4.16.3",
+		"lodash": "^4.17.10",
+		"react": "^16.4.1",
+		"react-dom": "^16.4.1",
+		"react-scripts-ts": "2.16.0",
+		"three": "^0.94.0"
+	},
+	"homepage": "https://borlaym.github.io/space/",
+	"scripts": {
+		"start": "react-scripts-ts start",
+		"build": "react-scripts-ts build && mv build docs",
+		"test": "react-scripts-ts test --env=jsdom",
+		"eject": "react-scripts-ts eject",
+		"server": "tsc -p server -inlineSourceMap --watch & nodemon --inspect build/server/index.js"
+	},
+	"devDependencies": {
+		"@types/jest": "^23.1.4",
+		"@types/lodash": "^4.14.110",
+		"@types/node": "^10.5.1",
+		"@types/react": "^16.4.6",
+		"@types/react-dom": "^16.0.6",
+		"@types/three": "^0.92.11",
+		"typescript": "^2.9.2"
+	}
 }

@@ -5,15 +5,20 @@ import Player from './Player';
 
 const app = express();
 const http = new Server(app);
-var io = socketio(http);
+const io = socketio(http);
+
+let players: Player[] = [];
 
 io.on('connection', function (socket) {
 	let player = new Player(socket);
+	players.push(player);
 	global.console.log(`New player ${player.shortId} connected`);
 	socket.on('disconnect', () => {
 		global.console.log(`Player ${player.shortId} disconnected`);
+		players = players.filter(p => p !== player);
 	});
 	socket.on('state', (state) => {
+		player.state = state;
 		socket.broadcast.emit('state', {
 			player: player.shortId,
 			...state
@@ -21,6 +26,12 @@ io.on('connection', function (socket) {
 	});
 	socket.broadcast.emit('newPlayer', {
 		player: player.shortId
+	});
+	socket.emit('existingPlayers', {
+		players: players.filter(p => p !== player).map(p => ({
+			player: player.shortId,
+			...player.state
+		}))
 	});
 });
 

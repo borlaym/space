@@ -63,6 +63,18 @@ connection.on('newPlayer', (data: { player: string}) => {
 	mesh.position.y = -1;
 });
 
+connection.on('existingPlayers', (data: { players: InterfacePlayer[] }) => {
+	data.players.forEach(player => {
+		const mesh = new THREE.Mesh(playerGeometry, playerMaterial);
+		players.push({
+			mesh,
+			player: player.player
+		});
+		scene.add(mesh);
+		mesh.position.y = -1;
+	})
+});
+
 connection.on('state', (data: { player: string, x: number, y: number, z: number }) => {
 	const player = players.find(p => p.player === data.player);
 	if (player) {

@@ -16,6 +16,9 @@ io.on('connection', function (socket) {
 	socket.on('disconnect', () => {
 		global.console.log(`Player ${player.shortId} disconnected`);
 		players = players.filter(p => p !== player);
+		socket.broadcast.emit('disconnectedPlayer', {
+			player: player.shortId
+		});
 	});
 	socket.on('state', (state) => {
 		player.state = state;

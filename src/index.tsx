@@ -46,7 +46,7 @@ const colliders: THREE.Object3D[] = [cube];
 const playerGeometry = new THREE.CubeGeometry(0.5, 2, 0.5);
 const playerMaterial = new THREE.MeshLambertMaterial({ color: 0xff0000 });
 
-const players: InterfacePlayer[] = [];
+let players: InterfacePlayer[] = [];
 
 interface InterfacePlayer {
 	player: string,
@@ -73,6 +73,14 @@ connection.on('existingPlayers', (data: { players: InterfacePlayer[] }) => {
 		scene.add(mesh);
 		mesh.position.y = -1;
 	})
+});
+
+connection.on('disconnectedPlayer', (data: { player: string }) => {
+	const player = players.find(p => p.player === data.player);
+	if (player) {
+		scene.remove(player.mesh);
+	}
+	players = players.filter(p => p.player !== data.player);
 });
 
 connection.on('state', (data: { player: string, x: number, y: number, z: number }) => {

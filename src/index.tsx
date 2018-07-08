@@ -3,7 +3,7 @@ import * as socketio from 'socket.io-client';
 import * as THREE from 'three';
 
 // const connection = socketio('http://localhost:3001');
-const connection = socketio('http://marci-fps-test.herokuapp.com');
+const connection = socketio('https://marci-fps-test.herokuapp.com');
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -116,7 +116,6 @@ document.addEventListener('keyup', (event) => {
 });
 
 const onMouseMove = (event: MouseEvent) => {
-	global.console.log(event);
 	state.mouseMovement.x += event.movementX;
 	state.mouseMovement.y += event.movementY;
 };

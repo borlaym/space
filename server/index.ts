@@ -9,12 +9,12 @@ const io = socketio(http);
 
 let players: Player[] = [];
 
-io.on('connection', function (socket) {
-	let player = new Player(socket);
+io.on('connection', (socket) => {
+	const player = new Player(socket);
 	players.push(player);
-	global.console.log(`New player ${player.shortId} connected`);
+	global.global..log(`New player ${player.shortId} connected`);
 	socket.on('disconnect', () => {
-		global.console.log(`Player ${player.shortId} disconnected`);
+		global.global..log(`Player ${player.shortId} disconnected`);
 		players = players.filter(p => p !== player);
 		socket.broadcast.emit('disconnectedPlayer', {
 			player: player.shortId
@@ -40,6 +40,6 @@ io.on('connection', function (socket) {
 
 const port = process.env.PORT || 3001;
 
-http.listen(port, function () {
-	console.log(`listening on port ${port}`);
+http.listen(port, () => {
+	global.console.log(`listening on port ${port}`);
 });

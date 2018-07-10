@@ -2,8 +2,8 @@ import { uniq } from 'lodash';
 import * as socketio from 'socket.io-client';
 import * as THREE from 'three';
 
-// const connection = socketio('http://localhost:3001');
-const connection = socketio('https://marci-fps-test.herokuapp.com');
+const serverName = process.env.NODE_ENV === 'production' ? 'https://marci-fps-test.herokuapp.com' : 'http://localhost:3001';
+const connection = socketio(serverName);
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -64,7 +64,7 @@ connection.on('newPlayer', (data: { player: string}) => {
 	mesh.position.y = -1;
 });
 
-connection.on('existingPlayers', (data: { players: InterfacePlayer[] }) => {
+connection.on('existingPlayers', (data: { players: InterfacePlayer[], yourName: string }) => {
 	data.players.forEach(player => {
 		const mesh = new THREE.Mesh(playerGeometry, playerMaterial);
 		players.push({
@@ -74,6 +74,10 @@ connection.on('existingPlayers', (data: { players: InterfacePlayer[] }) => {
 		scene.add(mesh);
 		mesh.position.y = -1;
 	})
+	const div = document.createElement('div');
+	div.innerHTML = `Name: ${data.yourName}<br>Server: ${serverName}`;
+	div.className = 'nametag';
+	document.body.appendChild(div);
 });
 
 connection.on('disconnectedPlayer', (data: { player: string }) => {
@@ -89,6 +93,13 @@ connection.on('state', (data: { player: string, x: number, y: number, z: number 
 	if (player) {
 		player.mesh.position.set(data.x, -1, data.z);
 	}
+});
+
+connection.on('disconnect', () => {
+	const div = document.createElement('div');
+	div.innerHTML = `You have been disconnected due to inactivity`;
+	div.className = 'status';
+	document.body.appendChild(div);
 });
 
 interface InterfaceState {

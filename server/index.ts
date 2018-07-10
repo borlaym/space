@@ -12,9 +12,9 @@ let players: Player[] = [];
 io.on('connection', (socket) => {
 	const player = new Player(socket);
 	players.push(player);
-	global.global..log(`New player ${player.shortId} connected`);
+	global.console.log(`New player ${player.shortId} connected`);
 	socket.on('disconnect', () => {
-		global.global..log(`Player ${player.shortId} disconnected`);
+		global.console.log(`Player ${player.shortId} disconnected`);
 		players = players.filter(p => p !== player);
 		socket.broadcast.emit('disconnectedPlayer', {
 			player: player.shortId
@@ -26,6 +26,7 @@ io.on('connection', (socket) => {
 			player: player.shortId,
 			...state
 		});
+		player.didActivate();
 	});
 	socket.broadcast.emit('newPlayer', {
 		player: player.shortId
@@ -34,9 +35,25 @@ io.on('connection', (socket) => {
 		players: players.filter(p => p !== player).map(p => ({
 			player: player.shortId,
 			...player.state
-		}))
+		})),
+		yourName: player.shortId
 	});
 });
+
+function detectInactivePlayers() {
+	players.forEach(player => {
+		if (!player.isActive) {
+			global.console.log(`Player ${player.shortId} timed out`);
+			players = players.filter(p => p !== player);
+			player.socket.emit('disconnect');
+			player.socket.broadcast.emit('disconnectedPlayer', {
+				player: player.shortId
+			});
+		}
+	});
+}
+
+setInterval(detectInactivePlayers, 100);
 
 const port = process.env.PORT || 3001;
 

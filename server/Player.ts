@@ -8,9 +8,19 @@ export default class Player {
 		y: number,
 		z: number
 	}
+	public lastActivity: number;
 	constructor(socket: SocketIO.Socket) {
 		this.socket = socket;
 		this.id = uuid();
+		this.lastActivity = Date.now();
+	}
+
+	public didActivate() {
+		this.lastActivity = Date.now();
+	}
+
+	get isActive() {
+		return Date.now() - this.lastActivity < 1000;
 	}
 
 	get shortId() {

@@ -36,6 +36,7 @@ interface InterfacePlayer {
 interface InterfaceGameState {
 	players: Array<{
 		name: string,
+		ry: number,
 		x: number,
 		y: number,
 		z: number
@@ -48,6 +49,7 @@ connection.on('gameState', (data: InterfaceGameState) => {
 		if (localPlayer) {
 			// Update existing player
 			localPlayer.mesh.position.set(player.x, player.y, player.z);
+			localPlayer.mesh.rotation.y = player.ry;
 		} else {
 			// Add new player
 			const mesh = createPlayerMesh();
@@ -56,6 +58,7 @@ connection.on('gameState', (data: InterfaceGameState) => {
 				name: player.name
 			});
 			mesh.position.set(player.x, player.y, player.z);
+			mesh.rotation.y = player.ry;
 			scene.add(mesh);
 		}
 	});
@@ -154,9 +157,10 @@ function animate() {
 	state.mouseMovement.y = 0;
 
 	connection.emit('state', {
+		ry: camera.rotation.y,
 		x: camera.position.x,
 		y: -1,
-		z: camera.position.z,
+		z: camera.position.z
 	});
 
 	requestAnimationFrame(animate);

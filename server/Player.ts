@@ -4,6 +4,7 @@ export default class Player {
 	public socket: SocketIO.Socket;
 	public id: string;
 	public state: {
+		ry: number,
 		x: number,
 		y: number,
 		z: number

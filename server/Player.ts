@@ -20,7 +20,7 @@ export default class Player {
 	}
 
 	get isActive() {
-		return Date.now() - this.lastActivity < 1000;
+		return Date.now() - this.lastActivity < 10 * 1000;
 	}
 
 	get shortId() {

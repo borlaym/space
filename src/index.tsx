@@ -1,64 +1,43 @@
-import { uniq } from 'lodash';
+import createPlayerMesh from './createPlayerMesh';
+import createRoom from './createRoom';
 import * as socketio from 'socket.io-client';
 import * as THREE from 'three';
+import { uniq } from 'lodash';
 
 const serverName = process.env.NODE_ENV === 'production' ? 'https://marci-fps-test.herokuapp.com' : 'http://localhost:3001';
 const connection = socketio(serverName);
 
+const SPEED = 0.1;
+const TURN_SPEED = 4;
+
 const scene = new THREE.Scene();
+
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.z = 4;
+
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
-
 renderer.domElement.onclick = () => {
 	renderer.domElement.requestPointerLock();
 }
 
-const texture = new THREE.TextureLoader().load("textures/1.jpg");
-texture.wrapS = THREE.RepeatWrapping;
-texture.wrapT = THREE.RepeatWrapping;
-texture.repeat.set(4, 4);
+const room = createRoom(scene);
 
-const geometry = new THREE.CubeGeometry(4, 4, 10, 50, 50, 50);
-const material = new THREE.MeshLambertMaterial({ color: 0xaaaaaa, map: texture, side: THREE.DoubleSide });
-const cube = new THREE.Mesh(geometry, material);
-
-const light = new THREE.PointLight(0xffffff, 13, 5, 2);
-light.position.set(0, 1.5, 2.5);
-scene.add(light);
-
-const light2 = new THREE.PointLight(0xffffff, 13, 5, 2);
-light2.position.set(0, 1.5, 0);
-scene.add(light2);
-
-const light3= new THREE.PointLight(0xffffff, 13, 5, 2);
-light3.position.set(0, 1.5, -2.5);
-scene.add(light3);
-
-scene.add(cube);
-camera.position.z = 4;
-
-const SPEED = 0.1;
-const TURN_SPEED = 4;
-
-const colliders: THREE.Object3D[] = [cube];
-
-const playerGeometry = new THREE.CubeGeometry(0.5, 2, 0.5);
-const playerMaterial = new THREE.MeshLambertMaterial({ color: 0xff0000 });
+const colliders: THREE.Object3D[] = [room];
 
 let players: InterfacePlayer[] = [];
 
 interface InterfacePlayer {
-	player: string,
+	name: string,
 	mesh: THREE.Mesh
 }
 
 connection.on('newPlayer', (data: { player: string}) => {
-	const mesh = new THREE.Mesh(playerGeometry, playerMaterial);
+	const mesh = createPlayerMesh();
 	players.push({
 		mesh,
-		player: data.player
+		name: data.player
 	});
 	scene.add(mesh);
 	mesh.position.y = -1;
@@ -66,10 +45,10 @@ connection.on('newPlayer', (data: { player: string}) => {
 
 connection.on('existingPlayers', (data: { players: InterfacePlayer[], yourName: string }) => {
 	data.players.forEach(player => {
-		const mesh = new THREE.Mesh(playerGeometry, playerMaterial);
+		const mesh = createPlayerMesh();
 		players.push({
 			mesh,
-			player: player.player
+			name: player.name
 		});
 		scene.add(mesh);
 		mesh.position.y = -1;
@@ -81,15 +60,15 @@ connection.on('existingPlayers', (data: { players: InterfacePlayer[], yourName: 
 });
 
 connection.on('disconnectedPlayer', (data: { player: string }) => {
-	const player = players.find(p => p.player === data.player);
+	const player = players.find(p => p.name === data.player);
 	if (player) {
 		scene.remove(player.mesh);
 	}
-	players = players.filter(p => p.player !== data.player);
+	players = players.filter(p => p.name !== data.player);
 });
 
 connection.on('state', (data: { player: string, x: number, y: number, z: number }) => {
-	const player = players.find(p => p.player === data.player);
+	const player = players.find(p => p.name === data.player);
 	if (player) {
 		player.mesh.position.set(data.x, -1, data.z);
 	}

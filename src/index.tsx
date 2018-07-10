@@ -71,13 +71,12 @@ connection.on('gameState', (data: InterfaceGameState) => {
 	players = players.filter(player => removedPlayers.indexOf(player) === -1);
 });
 
-// connection.on('connect', (data: { name: string }) => {
-// 	console.log(data);
-// 	const div = document.createElement('div');
-// 	div.innerHTML = `Name: ${data.name}<br>Server: ${serverName}`;
-// 	div.className = 'nametag';
-// 	document.body.appendChild(div);
-// });
+connection.on('init', (data: { name: string }) => {
+	const div = document.createElement('div');
+	div.innerHTML = `Name: ${data.name}<br>Server: ${serverName}`;
+	div.className = 'nametag';
+	document.body.appendChild(div);
+});
 
 interface InterfaceState {
 	keysDown: string[],

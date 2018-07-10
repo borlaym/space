@@ -21,7 +21,7 @@ io.on('connection', (socket) => {
 		player.state = state;
 		player.didActivate();
 	});
-	socket.emit('connect', {
+	socket.emit('init', {
 		name: player.shortId
 	});
 });

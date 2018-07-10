@@ -5,7 +5,9 @@ const playerGeometry = new THREE.CubeGeometry(0.5, 2, 0.5);
 const playerMaterial = new THREE.MeshLambertMaterial({ color: 0xff0000 });
 
 export default function createPlayerMesh() {
-	return new THREE.Mesh(playerGeometry, playerMaterial);
+	const mesh = new THREE.Mesh(playerGeometry, playerMaterial);
+	mesh.position.y = -1;
+	return mesh;
 }
 
 

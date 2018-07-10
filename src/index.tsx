@@ -33,53 +33,51 @@ interface InterfacePlayer {
 	mesh: THREE.Mesh
 }
 
-connection.on('newPlayer', (data: { player: string}) => {
-	const mesh = createPlayerMesh();
-	players.push({
-		mesh,
-		name: data.player
-	});
-	scene.add(mesh);
-	mesh.position.y = -1;
-});
+interface InterfaceGameState {
+	players: Array<{
+		name: string,
+		x: number,
+		y: number,
+		z: number
+	}>
+};
 
-connection.on('existingPlayers', (data: { players: InterfacePlayer[], yourName: string }) => {
+connection.on('gameState', (data: InterfaceGameState) => {
 	data.players.forEach(player => {
-		const mesh = createPlayerMesh();
-		players.push({
-			mesh,
-			name: player.name
-		});
-		scene.add(mesh);
-		mesh.position.y = -1;
-	})
-	const div = document.createElement('div');
-	div.innerHTML = `Name: ${data.yourName}<br>Server: ${serverName}`;
-	div.className = 'nametag';
-	document.body.appendChild(div);
+		const localPlayer = players.find(p => p.name === player.name);
+		if (localPlayer) {
+			// Update existing player
+			localPlayer.mesh.position.set(player.x, player.y, player.z);
+		} else {
+			// Add new player
+			const mesh = createPlayerMesh();
+			players.push({
+				mesh,
+				name: player.name
+			});
+			mesh.position.set(player.x, player.y, player.z);
+			scene.add(mesh);
+		}
+	});
+	const removedPlayers: InterfacePlayer[] = [];
+	// Remove non-existent players
+	players.forEach(player => {
+		const remotePlayer = data.players.find(p => p.name === player.name);
+		if (!remotePlayer) {
+			scene.remove(player.mesh);
+			removedPlayers.push(player);
+		}
+	});
+	players = players.filter(player => removedPlayers.indexOf(player) === -1);
 });
 
-connection.on('disconnectedPlayer', (data: { player: string }) => {
-	const player = players.find(p => p.name === data.player);
-	if (player) {
-		scene.remove(player.mesh);
-	}
-	players = players.filter(p => p.name !== data.player);
-});
-
-connection.on('state', (data: { player: string, x: number, y: number, z: number }) => {
-	const player = players.find(p => p.name === data.player);
-	if (player) {
-		player.mesh.position.set(data.x, -1, data.z);
-	}
-});
-
-connection.on('disconnect', () => {
-	const div = document.createElement('div');
-	div.innerHTML = `You have been disconnected due to inactivity`;
-	div.className = 'status';
-	document.body.appendChild(div);
-});
+// connection.on('connect', (data: { name: string }) => {
+// 	console.log(data);
+// 	const div = document.createElement('div');
+// 	div.innerHTML = `Name: ${data.name}<br>Server: ${serverName}`;
+// 	div.className = 'nametag';
+// 	document.body.appendChild(div);
+// });
 
 interface InterfaceState {
 	keysDown: string[],
@@ -158,7 +156,7 @@ function animate() {
 
 	connection.emit('state', {
 		x: camera.position.x,
-		y: camera.position.y,
+		y: -1,
 		z: camera.position.z,
 	});
 

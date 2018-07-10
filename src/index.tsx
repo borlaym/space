@@ -42,10 +42,12 @@ interface InterfaceGameState {
 		x: number,
 		y: number,
 		z: number
-	}>
+	}>,
+	yourHp: number
 };
 
 const playerMaterial = new THREE.MeshLambertMaterial({ color: 0xff0000 });
+const hpdisplay = document.querySelector('.hp');
 
 connection.on('gameState', (data: InterfaceGameState) => {
 	data.players.forEach(player => {
@@ -84,6 +86,9 @@ connection.on('gameState', (data: InterfaceGameState) => {
 		}
 	});
 	players = players.filter(player => removedPlayers.indexOf(player) === -1);
+	if (hpdisplay) {
+		hpdisplay.innerHTML = String(data.yourHp);
+	}
 });
 
 connection.on('init', (data: { name: string }) => {
@@ -121,13 +126,12 @@ document.addEventListener('click', () => {
 	const raycaster = new THREE.Raycaster();
 	raycaster.setFromCamera(new THREE.Vector2(), camera);
 	const results = raycaster.intersectObjects(players.map(player => player.mesh));
-	console.log(results);
 	if (results.length) {
 		const targetPlayer = players.find(p => p.mesh === results[0].object);
 		if (targetPlayer) {
 			connection.emit('hit', {
 				name: targetPlayer.name
-			})
+			});
 		}
 	}
 });

@@ -10,7 +10,7 @@
 			margin: 0;
 		}
 
-		.nametag, .status {
+		.nametag, .status, .hp {
 			position: fixed;
 			top: 0;
 			left: 0;
@@ -20,6 +20,14 @@
 
 		.status {
 			top: 30px;
+		}
+
+		.hp {
+			top: auto;
+			left: auto;
+			bottom: 0;
+			right: 0;
+			font-size: 40px;
 		}
 	</style>
     <!--
@@ -40,5 +48,6 @@
     <title>React App</title>
   </head>
   <body>
+	  <div class="hp">100</div>
   </body>
 </html>

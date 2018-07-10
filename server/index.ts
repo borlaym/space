@@ -48,7 +48,8 @@ function sendGameState() {
 				name: p.shortId,
 				hp: p.hp,
 				...p.state
-			}))
+			})),
+			yourHp: player.hp
 		};
 		player.socket.emit('gameState', gameState);
 	});

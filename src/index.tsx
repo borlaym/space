@@ -30,11 +30,13 @@ let players: InterfacePlayer[] = [];
 
 interface InterfacePlayer {
 	name: string,
+	hp: number,
 	mesh: THREE.Mesh
 }
 
 interface InterfaceGameState {
 	players: Array<{
+		hp: number,
 		name: string,
 		ry: number,
 		x: number,
@@ -43,6 +45,8 @@ interface InterfaceGameState {
 	}>
 };
 
+const playerMaterial = new THREE.MeshLambertMaterial({ color: 0xff0000 });
+
 connection.on('gameState', (data: InterfaceGameState) => {
 	data.players.forEach(player => {
 		const localPlayer = players.find(p => p.name === player.name);
@@ -50,15 +54,23 @@ connection.on('gameState', (data: InterfaceGameState) => {
 			// Update existing player
 			localPlayer.mesh.position.set(player.x, player.y, player.z);
 			localPlayer.mesh.rotation.y = player.ry;
+			localPlayer.hp = player.hp;
+			const mat = playerMaterial.clone();
+			mat.color.setHSL(0, 1, player.hp / 100);
+			localPlayer.mesh.material = mat;
 		} else {
 			// Add new player
 			const mesh = createPlayerMesh();
 			players.push({
 				mesh,
+				hp: player.hp,
 				name: player.name
 			});
 			mesh.position.set(player.x, player.y, player.z);
 			mesh.rotation.y = player.ry;
+			const mat = playerMaterial.clone();
+			mat.color.setHSL(0, 1, player.hp / 100);
+			mesh.material = mat;
 			scene.add(mesh);
 		}
 	});
@@ -105,10 +117,26 @@ document.addEventListener('keyup', (event) => {
 	state.keysDown = state.keysDown.filter(key => key !== event.key);
 });
 
+document.addEventListener('click', () => {
+	const raycaster = new THREE.Raycaster();
+	raycaster.setFromCamera(new THREE.Vector2(), camera);
+	const results = raycaster.intersectObjects(players.map(player => player.mesh));
+	console.log(results);
+	if (results.length) {
+		const targetPlayer = players.find(p => p.mesh === results[0].object);
+		if (targetPlayer) {
+			connection.emit('hit', {
+				name: targetPlayer.name
+			})
+		}
+	}
+});
+
 const onMouseMove = (event: MouseEvent) => {
 	state.mouseMovement.x += event.movementX;
 	state.mouseMovement.y += event.movementY;
 };
+
 
 const lockChangeAlert = () => {
 	if (document.pointerLockElement === renderer.domElement) {

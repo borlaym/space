@@ -9,11 +9,13 @@ export default class Player {
 		y: number,
 		z: number
 	}
+	public hp: number;
 	public lastActivity: number;
 	constructor(socket: SocketIO.Socket) {
 		this.socket = socket;
 		this.id = uuid();
 		this.lastActivity = Date.now();
+		this.hp = 100;
 	}
 
 	public didActivate() {

@@ -24,6 +24,12 @@ io.on('connection', (socket) => {
 	socket.emit('init', {
 		name: player.shortId
 	});
+	socket.on('hit', (data) => {
+		const targetPlayer = players.find(p => p.shortId === data.name);
+		if (targetPlayer) {
+			targetPlayer.hp = targetPlayer.hp - 10;
+		}
+	})
 });
 
 function detectInactivePlayers() {
@@ -40,6 +46,7 @@ function sendGameState() {
 		const gameState = {
 			players: players.filter(p => p !== player).map(p => ({
 				name: p.shortId,
+				hp: p.hp,
 				...p.state
 			}))
 		};

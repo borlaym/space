@@ -27,7 +27,7 @@ io.on('connection', (socket) => {
 	socket.on('hit', (data) => {
 		const targetPlayer = players.find(p => p.shortId === data.name);
 		if (targetPlayer) {
-			targetPlayer.hp = targetPlayer.hp - 10;
+			targetPlayer.hp = Math.max(targetPlayer.hp - 10, 0);
 		}
 	})
 });
@@ -54,7 +54,14 @@ function sendGameState() {
 	});
 }
 
+function regen() {
+	players.forEach(p => {
+		p.hp = Math.min(p.hp + 1, 100);
+	});
+}
+
 setInterval(sendGameState, 1000/60);
+setInterval(regen, 100);
 setInterval(detectInactivePlayers, 100);
 
 const port = process.env.PORT || 3001;
